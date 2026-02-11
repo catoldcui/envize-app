@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/chenhuicui/code/envizeApp log --oneline -10)",
+      "Bash(git -C /Users/chenhuicui/code/envizeApp status)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(node --version:*)",
+      "Bash(npm:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo:*)",
+      "Bash(envize --version:*)",
+      "Bash(command envize ls --json --global)",
+      "Bash(command envize status:*)",
+      "Bash(command envize templates:*)",
+      "Bash(command envize explain:*)",
+      "Bash(command envize ls --json)",
+      "Bash(command envize ls:*)",
+      "Bash(curl:*)",
+      "Bash(sh:*)",
+      "Bash(source \"$HOME/.cargo/env\")",
+      "Bash(rsync:*)"
+    ]
+  }
+}
