@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "envizeapp-tmp",
+  "productName": "envizeApp",
   "version": "0.1.0",
-  "identifier": "com.chenhuicui.envizeapp-tmp",
+  "identifier": "com.chenhuicui.envizeapp",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "envizeapp-tmp",
+        "title": "envizeApp",
         "width": 800,
         "height": 600
       }
@@ -31,5 +31,20 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "shell": {
+      "open": true,
+      "scope": [
+        {
+          "name": "envize",
+          "cmd": "envize",
+          "args": true
+        }
+      ]
+    },
+    "fs": {
+      "scope": ["$HOME/.envize/**"]
+    }
   }
 }

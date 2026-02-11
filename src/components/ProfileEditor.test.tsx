@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { ProfileEditor } from "./ProfileEditor";
 import type { Profile } from "../lib/parser";
 
