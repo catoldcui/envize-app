@@ -6,9 +6,28 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "shell:allow-execute",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "envize",
+          "cmd": "envize",
+          "args": true
+        }
+      ]
+    },
     "shell:allow-open",
-    "fs:allow-read",
-    "fs:allow-write"
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        { "path": "$HOME/.envize/**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        { "path": "$HOME/.envize/**" }
+      ]
+    }
   ]
 }

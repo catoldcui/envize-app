@@ -34,17 +34,7 @@
   },
   "plugins": {
     "shell": {
-      "open": true,
-      "scope": [
-        {
-          "name": "envize",
-          "cmd": "envize",
-          "args": true
-        }
-      ]
-    },
-    "fs": {
-      "scope": ["$HOME/.envize/**"]
+      "open": true
     }
   }
 }
