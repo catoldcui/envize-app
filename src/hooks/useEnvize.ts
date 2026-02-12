@@ -4,10 +4,12 @@ import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import type { ProfileSummary, EnvizeStatus, TemplateSummary } from "../types";
 
 async function runEnvize(...args: string[]): Promise<string> {
+  // Use system PATH - this works in development and should work in bundled apps
+  // if envize is properly installed and in PATH
   const cmd = Command.create("envize", args);
   const output = await cmd.execute();
   if (output.code !== 0) {
-    throw new Error(output.stderr || `envize ${args.join(" ")} failed`);
+    throw new Error(output.stderr || `envize ${args.join(" ")} failed with exit code ${output.code}`);
   }
   return output.stdout;
 }
@@ -90,6 +92,8 @@ export function useEnvize() {
     templates,
     loading,
     error,
+    setError,
+    setStatus,
     refresh,
     fetchTemplates,
     activateProfiles,

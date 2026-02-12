@@ -31,11 +31,36 @@ function App() {
   };
 
   const handleToggleProfile = async (name: string, active: boolean) => {
+    // Check if the profile actually exists before trying to toggle it
+    const profileExists = envize.profiles.some(p => p.name === name);
+    if (!profileExists) {
+      envize.setError(`Profile "${name}" does not exist and cannot be toggled`);
+      return;
+    }
+    
     const currentActive = envize.status?.active_profiles ?? [];
     const newActive = active
       ? [...currentActive, name]
       : currentActive.filter((n) => n !== name);
-    await envize.activateProfiles(newActive);
+    
+    try {
+      await envize.activateProfiles(newActive);
+    } catch (error) {
+      // Handle the error by showing it in the UI
+      if (error instanceof Error) {
+        envize.setError(`Failed to ${active ? 'activate' : 'deactivate'} profile "${name}": ${error.message}`);
+      } else {
+        envize.setError(`Failed to ${active ? 'activate' : 'deactivate'} profile "${name}"`);
+      }
+      
+      // Revert the active profiles state
+      if (envize.status) {
+        envize.setStatus({
+          ...envize.status,
+          active_profiles: currentActive
+        });
+      }
+    }
   };
 
   const handleSave = async (profile: Profile) => {
@@ -63,7 +88,20 @@ function App() {
     <div className="h-screen flex flex-col">
       {envize.error && (
         <div className="bg-red-50 text-red-700 px-4 py-2 text-sm">
-          {envize.error}
+          {envize.error.includes('envize command not found') ? (
+            <div>
+              <p className="font-medium">envize CLI tool not found</p>
+              <p className="mt-1">
+                Please install envize from{' '}
+                <a href="https://www.npmjs.com/package/envize" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">
+                  npm
+                </a>{' '}
+                using: <code className="bg-gray-100 px-1 rounded">npm install -g envize</code>
+              </p>
+            </div>
+          ) : (
+            envize.error
+          )}
         </div>
       )}
       <div className="flex flex-1 overflow-hidden">
