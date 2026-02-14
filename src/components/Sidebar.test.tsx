@@ -11,13 +11,13 @@ const mockProfiles: ProfileSummary[] = [
 
 describe("Sidebar", () => {
   it("renders profile names", () => {
-    render(<Sidebar profiles={mockProfiles} activeProfiles={[]} selectedProfile={null} onSelectProfile={vi.fn()} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
+    render(<Sidebar profiles={mockProfiles} activeProfiles={[]} selectedProfile={null} onSelectProfile={vi.fn()} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onCopyProfile={vi.fn()} onRenameProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
     expect(screen.getByText("dev-api")).toBeInTheDocument();
     expect(screen.getByText("staging")).toBeInTheDocument();
   });
 
   it("highlights active profiles", () => {
-    render(<Sidebar profiles={mockProfiles} activeProfiles={["dev-api"]} selectedProfile={null} onSelectProfile={vi.fn()} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
+    render(<Sidebar profiles={mockProfiles} activeProfiles={["dev-api"]} selectedProfile={null} onSelectProfile={vi.fn()} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onCopyProfile={vi.fn()} onRenameProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
     const toggles = screen.getAllByRole("switch");
     expect(toggles[0]).toBeChecked();
     expect(toggles[1]).not.toBeChecked();
@@ -25,13 +25,13 @@ describe("Sidebar", () => {
 
   it("calls onSelectProfile when clicking a profile", async () => {
     const onSelect = vi.fn();
-    render(<Sidebar profiles={mockProfiles} activeProfiles={[]} selectedProfile={null} onSelectProfile={onSelect} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
+    render(<Sidebar profiles={mockProfiles} activeProfiles={[]} selectedProfile={null} onSelectProfile={onSelect} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onCopyProfile={vi.fn()} onRenameProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
     await userEvent.click(screen.getByText("dev-api"));
     expect(onSelect).toHaveBeenCalledWith("dev-api");
   });
 
   it("renders + and - buttons", () => {
-    render(<Sidebar profiles={mockProfiles} activeProfiles={[]} selectedProfile={null} onSelectProfile={vi.fn()} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
+    render(<Sidebar profiles={mockProfiles} activeProfiles={[]} selectedProfile={null} onSelectProfile={vi.fn()} onToggleProfile={vi.fn()} onAddProfile={vi.fn()} onCopyProfile={vi.fn()} onRenameProfile={vi.fn()} onDeleteProfile={vi.fn()} />);
     expect(screen.getByLabelText("Add profile")).toBeInTheDocument();
     expect(screen.getByLabelText("Remove profile")).toBeInTheDocument();
   });

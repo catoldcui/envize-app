@@ -54,6 +54,22 @@ export function useEnvize() {
     [refresh]
   );
 
+  const addProfile = useCallback(
+    async (name: string) => {
+      await runEnvize("add", name, "--global");
+      await refresh();
+    },
+    [refresh]
+  );
+
+  const unuseProfile = useCallback(
+    async (name: string) => {
+      await runEnvize("unuse", name, "--global");
+      await refresh();
+    },
+    [refresh]
+  );
+
   const createProfile = useCallback(
     async (name: string, template?: string) => {
       if (template) {
@@ -97,6 +113,8 @@ export function useEnvize() {
     refresh,
     fetchTemplates,
     activateProfiles,
+    addProfile,
+    unuseProfile,
     createProfile,
     deleteProfile,
     readProfileContent,

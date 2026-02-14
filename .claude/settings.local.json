@@ -19,7 +19,11 @@
       "Bash(curl:*)",
       "Bash(sh:*)",
       "Bash(source \"$HOME/.cargo/env\")",
-      "Bash(rsync:*)"
+      "Bash(rsync:*)",
+      "WebSearch",
+      "Bash(command envize --help:*)",
+      "Bash(command envize unuse:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

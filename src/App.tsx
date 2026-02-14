@@ -31,35 +31,16 @@ function App() {
   };
 
   const handleToggleProfile = async (name: string, active: boolean) => {
-    // Check if the profile actually exists before trying to toggle it
-    const profileExists = envize.profiles.some(p => p.name === name);
-    if (!profileExists) {
-      envize.setError(`Profile "${name}" does not exist and cannot be toggled`);
-      return;
-    }
-    
-    const currentActive = envize.status?.active_profiles ?? [];
-    const newActive = active
-      ? [...currentActive, name]
-      : currentActive.filter((n) => n !== name);
-    
     try {
-      await envize.activateProfiles(newActive);
-    } catch (error) {
-      // Handle the error by showing it in the UI
-      if (error instanceof Error) {
-        envize.setError(`Failed to ${active ? 'activate' : 'deactivate'} profile "${name}": ${error.message}`);
+      if (active) {
+        await envize.addProfile(name);
       } else {
-        envize.setError(`Failed to ${active ? 'activate' : 'deactivate'} profile "${name}"`);
+        await envize.unuseProfile(name);
       }
-      
-      // Revert the active profiles state
-      if (envize.status) {
-        envize.setStatus({
-          ...envize.status,
-          active_profiles: currentActive
-        });
-      }
+    } catch (error) {
+      envize.setError(
+        `Failed to ${active ? "activate" : "deactivate"} profile "${name}": ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   };
 
@@ -74,6 +55,35 @@ function App() {
   const handleAddProfile = async (name: string, template?: string) => {
     await envize.createProfile(name, template);
     setSelectedName(name);
+  };
+
+  const handleCopyProfile = async (name: string) => {
+    const source = envize.profiles.find((p) => p.name === name);
+    if (!source) return;
+    const content = await envize.readProfileContent(source.path);
+    const copyName = `${name}-copy`;
+    
+    await envize.createProfile(copyName);
+    await envize.refresh();
+    const created = envize.profiles.find((p) => p.name === copyName);
+    if (created) {
+      await envize.writeProfileContent(created.path, content);
+    }
+    setSelectedName(copyName);
+  };
+
+  const handleRenameProfile = async (oldName: string, newName: string) => {
+    const source = envize.profiles.find((p) => p.name === oldName);
+    if (!source) return;
+    const content = await envize.readProfileContent(source.path);
+    await envize.createProfile(newName);
+    await envize.refresh();
+    const created = envize.profiles.find((p) => p.name === newName);
+    if (created) {
+      await envize.writeProfileContent(created.path, content);
+    }
+    await envize.deleteProfile(oldName);
+    setSelectedName(newName);
   };
 
   const handleDeleteProfile = async (name: string) => {
@@ -112,6 +122,8 @@ function App() {
           onSelectProfile={handleSelectProfile}
           onToggleProfile={handleToggleProfile}
           onAddProfile={handleAddProfile}
+          onCopyProfile={handleCopyProfile}
+          onRenameProfile={handleRenameProfile}
           onDeleteProfile={handleDeleteProfile}
           templates={envize.templates}
           onFetchTemplates={envize.fetchTemplates}
@@ -119,6 +131,7 @@ function App() {
         <ProfileEditor
           name={selectedName}
           profile={editingProfile}
+          isActive={selectedName != null && (envize.status?.active_profiles ?? []).includes(selectedName)}
           onSave={handleSave}
         />
       </div>

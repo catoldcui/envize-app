@@ -14,20 +14,20 @@ const mockProfile: Profile = {
 
 describe("ProfileEditor", () => {
   it("renders profile metadata", () => {
-    render(<ProfileEditor name="dev-api" profile={mockProfile} onSave={vi.fn()} />);
+    render(<ProfileEditor name="dev-api" profile={mockProfile} isActive={false} onSave={vi.fn()} />);
     expect(screen.getByDisplayValue("Dev API keys")).toBeInTheDocument();
     expect(screen.getByDisplayValue("dev, api")).toBeInTheDocument();
   });
 
   it("renders variable rows", () => {
-    render(<ProfileEditor name="dev-api" profile={mockProfile} onSave={vi.fn()} />);
+    render(<ProfileEditor name="dev-api" profile={mockProfile} isActive={false} onSave={vi.fn()} />);
     expect(screen.getByDisplayValue("API_KEY")).toBeInTheDocument();
     expect(screen.getByDisplayValue("sk-abc123")).toBeInTheDocument();
     expect(screen.getByDisplayValue("API_URL")).toBeInTheDocument();
   });
 
   it("shows empty state when no profile selected", () => {
-    render(<ProfileEditor name={null} profile={null} onSave={vi.fn()} />);
+    render(<ProfileEditor name={null} profile={null} isActive={false} onSave={vi.fn()} />);
     expect(screen.getByText(/select a profile/i)).toBeInTheDocument();
   });
 });
