@@ -9,6 +9,9 @@ env:
   CARGO_INCREMENTAL: 0
   RUST_BACKTRACE: short
 
+permissions:
+  contents: write
+
 jobs:
   release:
     strategy:
