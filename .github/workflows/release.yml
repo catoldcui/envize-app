@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags like v1.0.0
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: ubuntu-latest
+            rust_target: x86_64-unknown-linux-gnu
+            npm_target: linux-x64-gnu
+            bin: envize-app
+            artifact_name: app.tar.gz
+            release_name: Linux_x64_binary
+          
+          - os: macos-latest
+            rust_target: x86_64-apple-darwin
+            npm_target: darwin-x64
+            bin: envize-app
+            artifact_name: app.tar.gz
+            release_name: macOS_x64_binary
+          
+          - os: macos-latest
+            rust_target: aarch64-apple-darwin
+            npm_target: darwin-arm64
+            bin: envize-app
+            artifact_name: app.tar.gz
+            release_name: macOS_ARM64_binary
+          
+          - os: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            npm_target: win32-x64-msvc
+            bin: envize-app.exe
+            artifact_name: app.zip
+            release_name: Windows_x64_binary
+
+    runs-on: ${{ matrix.platform.os }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.rust_target }}
+
+      - name: Cache Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            src-tauri/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build the app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Envize App v__VERSION__'
+          releaseBody: 'See the assets to download this version and install the app.'
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.platform.rust_target }}
