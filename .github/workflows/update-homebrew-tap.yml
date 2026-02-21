@@ -1,0 +1,61 @@
+name: Update Homebrew Tap
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-tap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get release version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Download macOS DMGs and compute SHA256
+        id: sha256
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          ARM_URL="https://github.com/catoldcui/envize-app/releases/download/v${VERSION}/EnvizeApp_${VERSION}_aarch64.dmg"
+          X64_URL="https://github.com/catoldcui/envize-app/releases/download/v${VERSION}/EnvizeApp_${VERSION}_x64.dmg"
+
+          curl -sL "$ARM_URL" -o arm.dmg
+          curl -sL "$X64_URL" -o x64.dmg
+
+          echo "arm_sha256=$(sha256sum arm.dmg | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          echo "x64_sha256=$(sha256sum x64.dmg | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Checkout tap repository
+        uses: actions/checkout@v4
+        with:
+          repository: catoldcui/homebrew-envize
+          token: ${{ secrets.TAP_GITHUB_TOKEN }}
+
+      - name: Update cask formula
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          ARM_SHA=${{ steps.sha256.outputs.arm_sha256 }}
+          X64_SHA=${{ steps.sha256.outputs.x64_sha256 }}
+
+          sed -i "s/version \".*\"/version \"${VERSION}\"/" Casks/envize-app.rb
+          # Update ARM sha256 (first occurrence)
+          awk -v sha="${ARM_SHA}" '
+            /on_arm do/{in_arm=1}
+            /on_intel do/{in_arm=0}
+            in_arm && /sha256/{sub(/"[a-f0-9]+"/, "\"" sha "\"")}
+            {print}
+          ' Casks/envize-app.rb > Casks/envize-app.rb.tmp && mv Casks/envize-app.rb.tmp Casks/envize-app.rb
+          # Update Intel sha256
+          awk -v sha="${X64_SHA}" '
+            /on_intel do/{in_intel=1}
+            in_intel && /sha256/{sub(/"[a-f0-9]+"/, "\"" sha "\""); in_intel=0}
+            {print}
+          ' Casks/envize-app.rb > Casks/envize-app.rb.tmp && mv Casks/envize-app.rb.tmp Casks/envize-app.rb
+
+      - name: Commit and push updated cask
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/envize-app.rb
+          git commit -m "Update envize-app to v${{ steps.version.outputs.version }}"
+          git push
