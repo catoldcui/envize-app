@@ -28,10 +28,14 @@ A desktop application for managing environment variable profiles. EnvizeApp prov
 
 ```bash
 brew tap catoldcui/envize
-brew install --cask envize-app --no-quarantine
+brew install --cask envize-app
 ```
 
-> `--no-quarantine` is required because the app is not yet notarized with Apple.
+If macOS blocks the app on first launch, run:
+
+```bash
+xattr -cr /Applications/EnvizeApp.app
+```
 
 ### Direct download
 
