@@ -20,7 +20,33 @@ A desktop application for managing environment variable profiles. EnvizeApp prov
 - **Build Tool**: Vite
 - **Testing**: Vitest + React Testing Library
 
-## 📋 Prerequisites
+## 📦 Install
+
+> **Requires the `envize` CLI:** `npm install -g envize`
+
+### macOS — Homebrew (recommended)
+
+```bash
+brew tap catoldcui/envize
+brew install --cask envize-app --no-quarantine
+```
+
+> `--no-quarantine` is required because the app is not yet notarized with Apple.
+
+### Direct download
+
+Download the latest binary from the [Releases page](https://github.com/catoldcui/envize-app/releases/latest).
+
+| Platform | File |
+|---|---|
+| macOS (Apple Silicon) | `EnvizeApp_x.x.x_aarch64.dmg` |
+| macOS (Intel) | `EnvizeApp_x.x.x_x64.dmg` |
+| Windows | `EnvizeApp_x.x.x_x64-setup.exe` or `.msi` |
+| Linux | `EnvizeApp_x.x.x_amd64.AppImage` or `.deb` / `.rpm` |
+
+---
+
+## 📋 Prerequisites (for development)
 
 Before you begin, ensure you have met the following requirements:
 
@@ -228,6 +254,12 @@ npm install
 **Solution**: Make sure you're running the command from the project root directory:
 ```bash
 npm run tauri dev
+```
+
+**Problem**: macOS shows "EnvizeApp is damaged and can't be opened"
+**Solution**: The app is not yet notarized. If you installed via Homebrew, ensure you used `--no-quarantine`. For a direct DMG install, run:
+```bash
+xattr -cr /Applications/EnvizeApp.app
 ```
 
 ## 📄 License
